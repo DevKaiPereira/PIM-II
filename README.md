@@ -2,6 +2,8 @@
 ## Alunos (a):
 `Kaique Souza Pereira RA: 2625068`
 
+`Fazer algumas alterações na documentação do projeto, verificar com os intregantes`
+
 
 ## Sobre o Projeto
 
