@@ -2,22 +2,57 @@ import logging
 import re
 from typing import Any
 
+from prex_triagem.src.extrator import normalizar_texto
+
 logger = logging.getLogger(__name__)
 
 
-def _contar_ocorrencias(texto: str, termo: str) -> int:
+def _normalizar_termo(termo: str) -> str:
+    return normalizar_texto(termo)
 
-    padrao = r"\b" + re.escape(termo) + r"\b"
-    return len(re.findall(padrao, texto))
+
+def _compilar_padrao_termo(termo: str) -> re.Pattern[str] | None:
+    """Cria um regex robusto para um termo.
+
+    - Normaliza acentos/caixa igual ao texto extraído do PDF.
+    - Para termos com múltiplas palavras, permite separadores como espaço, hífen,
+      quebra de linha ou pontuação entre as palavras.
+    - Usa lookarounds em vez de \b para funcionar melhor com pontuação.
+    """
+    termo_norm = _normalizar_termo(termo)
+    if not termo_norm:
+        return None
+
+    partes = termo_norm.split()
+    if not partes:
+        return None
+
+    if len(partes) == 1:
+        nucleo = re.escape(partes[0])
+    else:
+        separador = r"(?:[\W_]+)"
+        nucleo = separador.join(re.escape(p) for p in partes)
+
+    padrao = rf"(?<!\w){nucleo}(?!\w)"
+    return re.compile(padrao)
+
+
+def _contar_ocorrencias(texto: str, termo: str) -> int:
+    padrao = _compilar_padrao_termo(termo)
+    if padrao is None:
+        return 0
+    return len(padrao.findall(texto))
 
 
 def calcular_pontuacao_merito(
     texto: str, config_bloco5: dict[str, Any]
 ) -> dict[str, Any]:
-  
+
+    texto = normalizar_texto(texto)
+
     termos_merito = config_bloco5.get("termos_de_merito", {})
     limiares = config_bloco5.get("limiares", {})
-    pontuacao_maxima = config_bloco5.get("pontuacao_maxima_total", 42)
+    pontuacao_maxima = config_bloco5.get("pontuacao_maxima_total")
 
     pontuacao_total = 0
     detalhes = {}
@@ -56,6 +91,13 @@ def calcular_pontuacao_merito(
             pontos_categoria,
             max_pontos,
             [t["termo"] for t in termos_encontrados_cat],
+        )
+
+    if pontuacao_maxima is None:
+        pontuacao_maxima = sum(
+            int(cat.get("max_pontos", 0))
+            for cat in termos_merito.values()
+            if isinstance(cat, dict)
         )
 
     limiar_alto = limiares.get("alto_merito", 25)
