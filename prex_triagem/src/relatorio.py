@@ -13,17 +13,11 @@ try:
     from reportlab.pdfgen import canvas
 
     REPORTLAB_DISPONIVEL = True
-except ImportError:  # pragma: no cover
+except ImportError:  
     REPORTLAB_DISPONIVEL = False
 
 SEPARADOR = "=" * 70
 SEPARADOR_FINO = "-" * 70
-
-ICONE_STATUS = {
-    "APTO": "✅ APTO",
-    "ALERTA": "⚠️  ALERTA",
-    "INAPTO": "❌ INAPTO",
-}
 
 NOMES_BLOCOS = {
     "bloco_1": "Bloco 1 — Exercício Pleno",
@@ -78,21 +72,6 @@ def _gerar_pdf_relatorio(linhas: list[str], caminho_pdf: Path) -> bool:
     c.save()
     return True
 
-def determinar_status(
-    resultados_blocos: dict[str, Any],
-    resultado_merito: dict[str, Any],
-) -> str:
-
-    for nome_bloco, resultado in resultados_blocos.items():
-        if resultado.get("impedimentos"):
-            return "INAPTO"
-
-    for nome_bloco, resultado in resultados_blocos.items():
-        if not resultado.get("aprovado", False):
-            return "ALERTA"
-
-    return "APTO"
-
 def gerar_relatorio_individual(
     nome_arquivo: str,
     resultados_blocos: dict[str, Any],
@@ -100,7 +79,6 @@ def gerar_relatorio_individual(
     pasta_saida: Path,
 ) -> Path:
 
-    status = determinar_status(resultados_blocos, resultado_merito)
     agora = datetime.now().strftime("%d/%m/%Y às %H:%M:%S")
     nome_relatorio = f"{Path(nome_arquivo).stem}_relatorio.txt"
     caminho_saida = pasta_saida / nome_relatorio
@@ -114,8 +92,6 @@ def gerar_relatorio_individual(
         SEPARADOR,
         f"  Proposta analisada : {nome_arquivo}",
         f"  Data/hora da análise: {agora}",
-        SEPARADOR,
-        f"  STATUS FINAL: {ICONE_STATUS[status]}",
         SEPARADOR,
         "",
     ]
@@ -183,9 +159,7 @@ def gerar_relatorio_individual(
     caminho_pdf = caminho_saida.with_suffix(".pdf")
     pdf_ok = _gerar_pdf_relatorio(linhas, caminho_pdf)
 
-    logger.info(
-        "Relatório individual gerado: %s (Status: %s)", caminho_saida, status
-    )
+    logger.info("Relatório individual gerado: %s", caminho_saida)
     if pdf_ok:
         logger.info("Relatório PDF gerado: %s", caminho_pdf)
     return caminho_saida
@@ -197,7 +171,6 @@ def inicializar_csv_consolidado(caminho_csv: Path) -> None:
         writer = csv.writer(f)
         writer.writerow([
             "arquivo",
-            "status",
             "bloco1_aprovado",
             "bloco1_impedimentos",
             "bloco2_aprovado",
@@ -220,7 +193,6 @@ def registrar_no_csv_consolidado(
     resultado_merito: dict[str, Any],
 ) -> None:
 
-    status = determinar_status(resultados_blocos, resultado_merito)
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
     def _imp(bloco_key: str) -> str:
@@ -233,7 +205,6 @@ def registrar_no_csv_consolidado(
 
     linha = [
         nome_arquivo,
-        status,
         resultados_blocos.get("bloco_1", {}).get("aprovado", False),
         _imp("bloco_1"),
         resultados_blocos.get("bloco_2", {}).get("aprovado", False),
@@ -251,4 +222,4 @@ def registrar_no_csv_consolidado(
         writer = csv.writer(f)
         writer.writerow(linha)
 
-    logger.debug("Registrado no CSV: %s — %s", nome_arquivo, status)
+    logger.debug("Registrado no CSV: %s", nome_arquivo)

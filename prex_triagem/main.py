@@ -94,17 +94,11 @@ def listar_relatorios_individuais(pasta_relatorios: Path) -> list[Path]:
 def exibir_resumo_final(resultados: list[dict], pasta_relatorios: Path = None) -> None:
 
     total = len(resultados)
-    aptos = sum(1 for r in resultados if r["status"] == "APTO")
-    alertas = sum(1 for r in resultados if r["status"] == "ALERTA")
-    inaptos = sum(1 for r in resultados if r["status"] == "INAPTO")
 
     print("\n" + "=" * 70)
     print("  RESUMO DA TRIAGEM — PREX/IFB")
     print("=" * 70)
     print(f"  Total de propostas analisadas : {total}")
-    print(f"  ✅ APTAS                       : {aptos}")
-    print(f"  ⚠️  ALERTA                      : {alertas}")
-    print(f"  ❌ INAPTAS                      : {inaptos}")
     print("=" * 70)
 
     if pasta_relatorios:

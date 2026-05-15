@@ -37,13 +37,18 @@ O sistema segue este fluxo:
 Para processar um PDF e gerar o relatório, execute o comando abaixo na raiz do projeto:
 
 ```bash
-export PYTHONPATH=$(pwd) && python3 prex_triagem/main.py > resultado.txt
+python3 -m prex_triagem > resultado.txt
+```
+
+Ou, se preferir um comando fixo (macOS/Linux), use o `Makefile` do projeto:
+
+```bash
+make run-txt
 ```
 
 ### Explicação do comando
 
-- `export PYTHONPATH=$(pwd)`: adiciona o diretório atual ao caminho de importação do Python, permitindo que os módulos do projeto sejam encontrados.
-- `python3 prex_triagem/main.py`: executa o script principal do sistema.
+- `python3 -m prex_triagem`: executa o pacote usando o ponto de entrada em `prex_triagem/__main__.py`.
 - `> resultado.txt`: redireciona a saída da execução para um arquivo TXT chamado `resultado.txt`.
 
 ### Resultado esperado
@@ -73,13 +78,22 @@ cp ~/Downloads/nome_do_arquivo.pdf ./prex_triagem/data/pdfs_entrada/
 ### Processar a triagem e salvar o resultado
 
 ```bash
-export PYTHONPATH=$(pwd) && python3 prex_triagem/main.py > resultado.txt
+python3 -m prex_triagem > resultado.txt
 ```
 
 ### Executar e visualizar a saída no terminal
 
 ```bash
-export PYTHONPATH=$(pwd) && python3 prex_triagem/main.py
+python3 -m prex_triagem
+```
+
+### Comandos prontos (opcional)
+
+Se você estiver no macOS/Linux, também pode usar:
+
+```bash
+make run      # roda e mostra no terminal
+make run-txt  # roda e salva em resultado.txt
 ```
 
 Esse comando executa o processo de triagem e exibe o resultado diretamente no terminal. Para salvar a saída em arquivo, utilize o redirecionamento para `resultado.txt`.
