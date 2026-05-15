@@ -128,7 +128,7 @@ def gerar_relatorio_individual(
     linhas += [
         "📊  Bloco 5 — Mérito e Qualidade (não eliminatório)",
         SEPARADOR_FINO,
-        f"   Pontuação obtida    : {resultado_merito['pontuacao_total']} / "
+        f"   Pontuação obtida    : {resultado_merito['pontuacao_total',]} / "
         f"{resultado_merito['pontuacao_maxima']} pontos",
         f"   Classificação       : {resultado_merito['classificacao']}",
         "",
@@ -137,8 +137,8 @@ def gerar_relatorio_individual(
 
     for categoria, detalhe in resultado_merito.get("detalhes_categorias", {}).items():
         nome_cat = categoria.replace("_", " ").title()
-        pontos = detalhe["pontos_obtidos"]
-        maximo = detalhe["max_pontos"]
+        pontos = detalhe.get("pontos_obtidos", 0)
+        maximo = detalhe.get("max_pontos", 0)
         termos_cat = [t["termo"] for t in detalhe.get("termos_encontrados", [])]
         termos_str = ", ".join(termos_cat) if termos_cat else "—"
         linhas.append(
