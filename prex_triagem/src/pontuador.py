@@ -12,13 +12,7 @@ def _normalizar_termo(termo: str) -> str:
 
 
 def _compilar_padrao_termo(termo: str) -> re.Pattern[str] | None:
-    """Cria um regex robusto para um termo.
-
-    - Normaliza acentos/caixa igual ao texto extraído do PDF.
-    - Para termos com múltiplas palavras, permite separadores como espaço, hífen,
-      quebra de linha ou pontuação entre as palavras.
-    - Usa lookarounds em vez de \b para funcionar melhor com pontuação.
-    """
+    
     termo_norm = _normalizar_termo(termo)
     if not termo_norm:
         return None
