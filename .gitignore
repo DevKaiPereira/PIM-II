@@ -16,3 +16,14 @@ env/
 # IDEs
 .idea/
 .vscode/
+
+# App artifacts
+*.log
+prex_triagem/logs/
+prex_triagem/data/pdfs_entrada/
+prex_triagem/relatorios/
+
+# Misc / local outputs
+package-lock.json
+resultado.json
+resultado.txt
