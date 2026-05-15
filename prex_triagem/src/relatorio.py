@@ -77,6 +77,7 @@ def gerar_relatorio_individual(
     resultados_blocos: dict[str, Any],
     resultado_merito: dict[str, Any],
     pasta_saida: Path,
+    pasta_saida_pdf: Path | None = None,
 ) -> Path:
 
     agora = datetime.now().strftime("%d/%m/%Y às %H:%M:%S")
@@ -156,7 +157,9 @@ def gerar_relatorio_individual(
     pasta_saida.mkdir(parents=True, exist_ok=True)
     caminho_saida.write_text("\n".join(linhas), encoding="utf-8")
 
-    caminho_pdf = caminho_saida.with_suffix(".pdf")
+    pasta_pdf = pasta_saida_pdf or pasta_saida
+    pasta_pdf.mkdir(parents=True, exist_ok=True)
+    caminho_pdf = pasta_pdf / f"{Path(nome_arquivo).stem}_relatorio.pdf"
     pdf_ok = _gerar_pdf_relatorio(linhas, caminho_pdf)
 
     logger.info("Relatório individual gerado: %s", caminho_saida)

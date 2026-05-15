@@ -55,6 +55,11 @@ make run-txt
 
 Após a execução, será criado o arquivo `resultado.txt` contendo o relatório com as informações extraídas do PDF processado.
 
+Além disso, os relatórios individuais gerados ficam em:
+
+- `prex_triagem/relatorios/relatorio_txt/` (TXT)
+- `prex_triagem/relatorios/relatorio_pdf/` (PDF)
+
 ## Estrutura do projeto
 
 ```text

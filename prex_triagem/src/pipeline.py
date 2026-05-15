@@ -17,6 +17,7 @@ def processar_proposta(
     caminho_pdf: Path,
     biblioteca: dict[str, Any],
     pasta_relatorios: Path,
+    pasta_relatorios_pdf: Path,
     caminho_csv_consolidado: Path,
     max_coordenadores: int = 1,
 ) -> Optional[dict[str, Any]]:
@@ -52,6 +53,7 @@ def processar_proposta(
         resultados_blocos=resultados_blocos,
         resultado_merito=resultado_merito,
         pasta_saida=pasta_relatorios,
+        pasta_saida_pdf=pasta_relatorios_pdf,
     )
 
     registrar_no_csv_consolidado(

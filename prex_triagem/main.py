@@ -9,6 +9,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from config.settings import (
     PASTA_PDFS,
     PASTA_RELATORIOS,
+    PASTA_RELATORIOS_TXT,
+    PASTA_RELATORIOS_PDF,
     ARQUIVO_BIBLIOTECA,
     RELATORIO_CONSOLIDADO,
     ARQUIVO_LOG,
@@ -117,6 +119,8 @@ def exibir_resumo_final(resultados: list[dict], pasta_relatorios: Path = None) -
             print("     (nenhum parecer encontrado)")
 
     print("\n  📁 Arquivos salvos em: relatorios/")
+    print("     • relatorio_txt/ (TXT)")
+    print("     • relatorio_pdf/ (PDF)")
     print(f"  📊 Relatório consolidado (CSV): {RELATORIO_CONSOLIDADO}")
     print(f"  📝 Log completo: {ARQUIVO_LOG}")
     print("=" * 70)
@@ -152,6 +156,8 @@ def main() -> None:
     print("-" * 70)
 
     PASTA_RELATORIOS.mkdir(parents=True, exist_ok=True)
+    PASTA_RELATORIOS_TXT.mkdir(parents=True, exist_ok=True)
+    PASTA_RELATORIOS_PDF.mkdir(parents=True, exist_ok=True)
     inicializar_csv_consolidado(RELATORIO_CONSOLIDADO)
 
     resultados = []
@@ -161,7 +167,8 @@ def main() -> None:
         resultado = processar_proposta(
             caminho_pdf=caminho_pdf,
             biblioteca=biblioteca,
-            pasta_relatorios=PASTA_RELATORIOS,
+            pasta_relatorios=PASTA_RELATORIOS_TXT,
+            pasta_relatorios_pdf=PASTA_RELATORIOS_PDF,
             caminho_csv_consolidado=RELATORIO_CONSOLIDADO,
             max_coordenadores=MAX_COORDENADORES,
         )
@@ -177,7 +184,7 @@ def main() -> None:
         duracao, len(resultados), len(pdfs)
     )
 
-    exibir_resumo_final(resultados, PASTA_RELATORIOS)
+    exibir_resumo_final(resultados, PASTA_RELATORIOS_TXT)
     
     print(f"\n  ⏱️  Tempo total: {duracao:.1f} segundos\n")
 
