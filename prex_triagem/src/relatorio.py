@@ -34,11 +34,6 @@ NOMES_BLOCOS = {
 
 
 def _sanitizar_texto_para_pdf(texto: str) -> str:
-    """Sanitiza texto para evitar erro de encoding na fonte padrão do ReportLab.
-
-    A fonte Courier padrão não suporta bem Unicode (acentos/emoji). Então aqui
-    removemos acentos e caracteres não-ASCII.
-    """
     if not texto:
         return ""
     texto = unicodedata.normalize("NFKD", texto)
@@ -65,8 +60,6 @@ def _gerar_pdf_relatorio(linhas: list[str], caminho_pdf: Path) -> bool:
 
     y = pagina_altura - margem
 
-    # Largura aproximada para Courier 9 em A4 com margem.
-    # (wrap por caracteres é mais robusto que medir stringWidth aqui)
     largura_wrap = 110
 
     for linha in linhas:
