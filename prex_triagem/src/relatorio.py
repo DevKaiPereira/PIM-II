@@ -100,33 +100,55 @@ def gerar_relatorio_individual(
     pasta_saida: Path,
 ) -> Path:
 
-    status = determinar_status(resultados_blocos, resultado_merito)
+    status = determinar_status(resultados_blocos, resultado_merito) # Mantido apenas para logs internos
     agora = datetime.now().strftime("%d/%m/%Y às %H:%M:%S")
     nome_relatorio = f"{Path(nome_arquivo).stem}_relatorio.txt"
     caminho_saida = pasta_saida / nome_relatorio
 
     linhas = []
+    
+    # Pega a classificação de mérito para brilhar no topo
+    classificacao_merito = resultado_merito.get('classificacao', 'NÃO AVALIADO').upper()
 
     linhas += [
         SEPARADOR,
-        "  SISTEMA DE TRIAGEM DE EDITAIS — PREX/IFB",
+        "  PARECER CONSULTIVO DA MÁQUINA — PREX/IFB",
         "  Base legal: Resolução nº 42/2020",
         SEPARADOR,
-        f"  Proposta analisada : {nome_arquivo}",
+        f"  Proposta analisada  : {nome_arquivo}",
         f"  Data/hora da análise: {agora}",
         SEPARADOR,
-        f"  STATUS FINAL: {ICONE_STATUS[status]}",
+        f"  CLASSIFICAÇÃO DE MÉRITO: {classificacao_merito} 🌟",
         SEPARADOR,
-        "  Nota: aprovação depende exclusivamente da aprovação e da ausência de "
-        "impeditivos em cada um dos blocos 1 a 4.",
-        "  A pontuação de mérito é informativa e não determina o status final.",
-        "",
     ]
 
+    # --- NOVO PAINEL INTELIGENTE DE ATENÇÃO PARA A EQUIPE ---
+    avisos_topo = []
+    for chave_bloco, nome_bloco in NOMES_BLOCOS.items():
+        resultado = resultados_blocos.get(chave_bloco, {})
+        for imp in resultado.get("impedimentos", []):
+            avisos_topo.append(f"- A máquina detectou a palavra '{imp}' no {nome_bloco}. Requer leitura humana rápida para confirmar contexto.")
+        for alerta in resultado.get("alertas", []):
+            avisos_topo.append(f"- Alerta no {nome_bloco}: {alerta}")
+
+    if avisos_topo:
+        linhas.append("  ATENÇÃO DA EQUIPE DE AVALIAÇÃO:")
+        for aviso in avisos_topo:
+            linhas.append(f"  {aviso}")
+    else:
+        linhas.append("  ATENÇÃO DA EQUIPE: A máquina não detectou palavras impeditivas. Documentação base parece regular.")
+    
+    linhas.append(SEPARADOR_FINO)
+    linhas.append("")
+    linhas.append("  DETALHAMENTO DA VARREDURA TÉCNICA:")
+    linhas.append("")
+
+    # --- RENDERIZAÇÃO DOS BLOCOS (Mantida igual ao original) ---
     for chave_bloco, nome_bloco in NOMES_BLOCOS.items():
         resultado = resultados_blocos.get(chave_bloco, {})
         aprovado = resultado.get("aprovado", False)
-        icone = "✅" if aprovado else "❌"
+        # O ícone muda para um aviso se tiver impedimentos, mas não diz mais "Reprovado"
+        icone = "✅" if aprovado else "⚠️"
 
         linhas += [
             f"{icone}  {nome_bloco}",
@@ -147,24 +169,24 @@ def gerar_relatorio_individual(
             linhas.append(f"   ⚠️  Alerta            : {alerta}")
 
         for imp in resultado.get("impedimentos", []):
-            linhas.append(f"   🚫 IMPEDIMENTO       : {imp}")
+            linhas.append(f"   🛑 Termo Impeditivo  : {imp}")
 
         linhas.append("")
 
+    # --- RENDERIZAÇÃO DO MÉRITO (Detalhes) ---
     linhas += [
-        "📊  Bloco 5 — Mérito e Qualidade (informativo; não determina aprovação)",
+        "📊  Bloco 5 — Mérito e Qualidade",
         SEPARADOR_FINO,
-        f"   Pontuação obtida    : {resultado_merito['pontuacao_total']} / "
-        f"{resultado_merito['pontuacao_maxima']} pontos",
-        f"   Classificação       : {resultado_merito['classificacao']}",
+        f"   Pontuação obtida    : {resultado_merito.get('pontuacao_total', 0)} / "
+        f"{resultado_merito.get('pontuacao_maxima', 42)} pontos",
         "",
         "   Detalhamento por categoria:",
     ]
 
     for categoria, detalhe in resultado_merito.get("detalhes_categorias", {}).items():
         nome_cat = categoria.replace("_", " ").title()
-        pontos = detalhe["pontos_obtidos"]
-        maximo = detalhe["max_pontos"]
+        pontos = detalhe.get("pontos_obtidos", 0)
+        maximo = detalhe.get("max_pontos", 0)
         termos_cat = [t["termo"] for t in detalhe.get("termos_encontrados", [])]
         termos_str = ", ".join(termos_cat) if termos_cat else "—"
         linhas.append(
@@ -176,7 +198,7 @@ def gerar_relatorio_individual(
         "",
         SEPARADOR,
         "  ⚠️  AVISO: Este relatório é uma ferramenta de APOIO à triagem.",
-        "  O resultado final é de responsabilidade dos avaliadores da PREX/IFB.",
+        "  A decisão final de admissibilidade é humana, de responsabilidade da PREX/IFB.",
         SEPARADOR,
     ]
 
@@ -187,7 +209,7 @@ def gerar_relatorio_individual(
     pdf_ok = _gerar_pdf_relatorio(linhas, caminho_pdf)
 
     logger.info(
-        "Relatório individual gerado: %s (Status: %s)", caminho_saida, status
+        "Relatório individual gerado: %s (Status Interno: %s)", caminho_saida, status
     )
     if pdf_ok:
         logger.info("Relatório PDF gerado: %s", caminho_pdf)
