@@ -1,10 +1,20 @@
 import csv
 import logging
+import textwrap
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
+
+try:
+    from reportlab.lib.pagesizes import A4
+    from reportlab.pdfgen import canvas
+
+    REPORTLAB_DISPONIVEL = True
+except ImportError:  # pragma: no cover
+    REPORTLAB_DISPONIVEL = False
 
 SEPARADOR = "=" * 70
 SEPARADOR_FINO = "-" * 70
@@ -21,6 +31,59 @@ NOMES_BLOCOS = {
     "bloco_3": "Bloco 3 — Composição da Equipe",
     "bloco_4": "Bloco 4 — Aderência ao Edital",
 }
+
+
+def _sanitizar_texto_para_pdf(texto: str) -> str:
+    """Sanitiza texto para evitar erro de encoding na fonte padrão do ReportLab.
+
+    A fonte Courier padrão não suporta bem Unicode (acentos/emoji). Então aqui
+    removemos acentos e caracteres não-ASCII.
+    """
+    if not texto:
+        return ""
+    texto = unicodedata.normalize("NFKD", texto)
+    texto = texto.encode("ascii", "ignore").decode("ascii")
+    return texto
+
+
+def _gerar_pdf_relatorio(linhas: list[str], caminho_pdf: Path) -> bool:
+    if not REPORTLAB_DISPONIVEL:
+        logger.warning(
+            "reportlab não instalado; pulando geração de PDF (%s)",
+            caminho_pdf.name,
+        )
+        return False
+
+    pagina_largura, pagina_altura = A4
+    margem = 36  # 0.5 in
+    fonte = "Courier"
+    tamanho_fonte = 9
+    altura_linha = tamanho_fonte + 2
+
+    c = canvas.Canvas(str(caminho_pdf), pagesize=A4)
+    c.setFont(fonte, tamanho_fonte)
+
+    y = pagina_altura - margem
+
+    # Largura aproximada para Courier 9 em A4 com margem.
+    # (wrap por caracteres é mais robusto que medir stringWidth aqui)
+    largura_wrap = 110
+
+    for linha in linhas:
+        linha = _sanitizar_texto_para_pdf(linha)
+        partes = textwrap.wrap(linha, width=largura_wrap) or [""]
+
+        for parte in partes:
+            if y < margem:
+                c.showPage()
+                c.setFont(fonte, tamanho_fonte)
+                y = pagina_altura - margem
+
+            c.drawString(margem, y, parte)
+            y -= altura_linha
+
+    c.save()
+    return True
 
 def determinar_status(
     resultados_blocos: dict[str, Any],
@@ -124,9 +187,14 @@ def gerar_relatorio_individual(
     pasta_saida.mkdir(parents=True, exist_ok=True)
     caminho_saida.write_text("\n".join(linhas), encoding="utf-8")
 
+    caminho_pdf = caminho_saida.with_suffix(".pdf")
+    pdf_ok = _gerar_pdf_relatorio(linhas, caminho_pdf)
+
     logger.info(
         "Relatório individual gerado: %s (Status: %s)", caminho_saida, status
     )
+    if pdf_ok:
+        logger.info("Relatório PDF gerado: %s", caminho_pdf)
     return caminho_saida
 
 def inicializar_csv_consolidado(caminho_csv: Path) -> None:
