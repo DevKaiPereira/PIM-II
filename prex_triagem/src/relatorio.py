@@ -117,6 +117,9 @@ def gerar_relatorio_individual(
         SEPARADOR,
         f"  STATUS FINAL: {ICONE_STATUS[status]}",
         SEPARADOR,
+        "  Nota: aprovação depende exclusivamente da aprovação e da ausência de "
+        "impeditivos em cada um dos blocos 1 a 4.",
+        "  A pontuação de mérito é informativa e não determina o status final.",
         "",
     ]
 
@@ -149,7 +152,7 @@ def gerar_relatorio_individual(
         linhas.append("")
 
     linhas += [
-        "📊  Bloco 5 — Mérito e Qualidade (não eliminatório)",
+        "📊  Bloco 5 — Mérito e Qualidade (informativo; não determina aprovação)",
         SEPARADOR_FINO,
         f"   Pontuação obtida    : {resultado_merito['pontuacao_total']} / "
         f"{resultado_merito['pontuacao_maxima']} pontos",
