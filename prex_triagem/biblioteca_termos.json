@@ -1,13 +1,14 @@
 {
   "_meta": {
-    "versao": "1.0",
-    "base_legal": "Resolução nº 42/2020 — IFB",
-    "ultima_atualizacao": "2025",
-    "instrucao": "Edite os termos abaixo conforme o edital vigente. Todos os termos devem estar em MINÚSCULAS e SEM ACENTOS para garantir compatibilidade com o pré-processamento."
+    "versao": "3.0",
+    "base_legal": "Resolução nº 42/2020 — IFB e Manuais SUAP PREX (submissão e gerenciamento)",
+    "ultima_atualizacao": "2026",
+    "instrucao": "Edite os termos abaixo conforme o edital vigente. Todos os termos devem estar em MINÚSCULAS e SEM ACENTOS.",
+    "refinamento": "Incluídos sinônimos, variantes e termos negativos/impeditivos com base nos documentos oficiais. Novos blocos criados para verificação de comunidade externa e documentação obrigatória."
   },
 
   "bloco_1_exercicio_pleno": {
-    "descricao": "Verifica se o proponente está em exercício pleno de suas funções no IFB",
+    "descricao": "Verifica se o proponente está em exercício pleno de suas funções no IFB (Art. 20 e Art. 23 da Resolução)",
     "obrigatorio": true,
     "termos_positivos": [
       "em exercicio",
@@ -15,11 +16,17 @@
       "docente efetivo",
       "professor efetivo",
       "tecnico administrativo",
+      "tecnico-administrativo",
       "em atividade",
       "lotado no campus",
       "lotado na reitoria",
       "vinculo ativo",
-      "quadro permanente"
+      "quadro permanente",
+      "servidor publico",
+      "cargo efetivo",
+      "integrante do quadro",
+      "professor do quadro permanente",
+      "tae efetivo"
     ],
     "termos_negativos_impeditivos": [
       "afastado para pos-graduacao",
@@ -27,18 +34,28 @@
       "afastado para mestrado",
       "licenca premio",
       "licenca capacitacao",
+      "licenca saude",
       "cedido para",
       "em afastamento",
       "licenca medica prolongada",
       "exonerado",
       "aposentado",
-      "redistribuido"
+      "redistribuido",
+      "professor substituto",
+      "professor temporario",
+      "professor visitante",
+      "cooperacao tecnica",
+      "contrato temporario",
+      "sem vinculo com o ifb",
+      "bolsista externo",
+      "estagiario",
+      "voluntario sem vinculo"
     ],
     "peso": 1
   },
 
   "bloco_2_vinculo_institucional": {
-    "descricao": "Confirma o vínculo do proponente e da proposta com o IFB",
+    "descricao": "Confirma o vínculo do proponente e da proposta com o IFB; alerta para parcerias externas (Art. 29, VII e Art. 30)",
     "obrigatorio": true,
     "termos_positivos": [
       "instituto federal de brasilia",
@@ -50,29 +67,57 @@
       "coordenador",
       "servidor do ifb",
       "docente do ifb",
-      "tecnico do ifb"
+      "tecnico do ifb",
+      "acao registrada no ifb",
+      "proposta institucional",
+      "vinculado ao ifb"
     ],
     "termos_negativos_impeditivos": [],
     "termos_de_alerta": [
       "outra instituicao",
-      "instituicao parceira exclusiva",
-      "sem vinculo"
+      "instituicao parceira",
+      "escola estadual",
+      "secretaria de",
+      "ong",
+      "sem vinculo",
+      "parceria com",
+      "convenio com",
+      "instituicao externa",
+      "outra universidade",
+      "prefeitura",
+      "governo",
+      "fundacao de apoio",
+      "associacao",
+      "cooperativa",
+      "empresa privada"
     ],
     "peso": 1
   },
 
   "bloco_3_composicao_equipe": {
-    "descricao": "Valida a composição mínima da equipe executora",
+    "descricao": "Valida a composição da equipe executora, com obrigatoriedade de discente para projetos (Art. 19 §2º e Art. 31, V)",
     "obrigatorio": true,
     "termos_positivos": [
       "equipe executora",
-      "coordenador",
+      "membro da equipe",
+      "equipe de trabalho",
+      "grupo de trabalho",
+      "equipe multidisciplinar",
+      "equipe interdisciplinar"
+    ],
+    "termos_discente_obrigatorio": [
       "discente",
       "aluno",
       "estudante",
-      "colaborador",
-      "membro da equipe",
-      "equipe de trabalho"
+      "aprendiz",
+      "bolsista",
+      "voluntario",
+      "membro discente",
+      "participacao discente",
+      "estudante do ifb",
+      "aluno de graduacao",
+      "aluno de tecnico",
+      "jovem aprendiz"
     ],
     "termos_docente_orientador": [
       "docente",
@@ -80,25 +125,45 @@
       "professora",
       "docente orientador",
       "professor orientador",
-      "coordenador docente"
+      "coordenador docente",
+      "supervisor academico",
+      "docente responsavel",
+      "professor supervisor"
     ],
     "termos_tecnico_administrativo": [
       "tecnico administrativo",
       "tecnico-administrativo",
       "servidor tecnico",
-      "tae"
+      "tae",
+      "assistente em administracao",
+      "tecnico de laboratorio",
+      "tecnico em assuntos educacionais",
+      "administrador"
     ],
     "funcoes_coordenacao": [
       "coordenador",
       "coordenadora",
       "coord.",
-      "proponente coordenador"
+      "proponente coordenador",
+      "responsavel pela acao",
+      "lider do projeto",
+      "coordenador geral",
+      "gestor da acao"
+    ],
+    "termos_membros_externos": [
+      "colaborador externo",
+      "voluntario externo",
+      "parceiro externo",
+      "convidado",
+      "membro da comunidade",
+      "participante externo",
+      "profissional convidado"
     ],
     "peso": 1
   },
 
   "bloco_4_aderencia_edital": {
-    "descricao": "Verifica se a proposta atende às áreas temáticas e linhas de extensão previstas no edital",
+    "descricao": "Verifica áreas temáticas, modalidades, documentação obrigatória e público externo (Art. 8º, Art. 10, Art. 13, Art. 29, Art. 31, IV)",
     "obrigatorio": true,
     "areas_tematicas_validas": [
       "comunicacao",
@@ -110,7 +175,13 @@
       "tecnologia e producao",
       "trabalho",
       "ciencia e tecnologia",
-      "desenvolvimento regional"
+      "desenvolvimento regional",
+      "esporte",
+      "lazer",
+      "direitos humanos",
+      "justica",
+      "tecnologia da informacao",
+      "empreendedorismo"
     ],
     "linhas_de_extensao_validas": [
       "alfabetizacao e letramento",
@@ -122,20 +193,91 @@
       "seguranca alimentar",
       "saude da familia",
       "tecnologias assistivas",
-      "inovacao tecnologica"
+      "inovacao tecnologica",
+      "arte e cultura",
+      "comunicacao comunitaria",
+      "desenvolvimento local e regional",
+      "desenvolvimento rural",
+      "direitos individuais e coletivos",
+      "emprego e renda",
+      "ensino aprendizagem",
+      "esporte e lazer",
+      "grupos sociais e vulneraveis",
+      "inclusao e desenvolvimento humano",
+      "patrimonio cultural",
+      "promocao a saude",
+      "questoes ambientais",
+      "saude animal",
+      "seguranca publica",
+      "turismo"
     ],
     "termos_de_modalidade": [
       "projeto de extensao",
       "programa de extensao",
       "curso de extensao",
       "evento de extensao",
-      "prestacao de servico"
+      "prestacao de servico",
+      "oficina",
+      "palestra",
+      "seminario",
+      "congresso",
+      "mostra",
+      "feira",
+      "campanha",
+      "acao continuada",
+      "acao periodica",
+      "workshop",
+      "simposio",
+      "coloquio",
+      "roda de conversa"
+    ],
+    "documentos_obrigatorios": [
+      "declaracao de anuencia da chefia",
+      "nada-consta",
+      "declaracao de adimplencia",
+      "termo de compromisso",
+      "termo de parceria",
+      "termo de adesao",
+      "plano de trabalho",
+      "cronograma",
+      "memoria de calculo",
+      "plano de desembolso",
+      "anexos obrigatorios",
+      "curriculum vitae do membro externo",
+      "ato de nomeacao da comissao"
+    ],
+    "termos_publico_externo": [
+      "comunidade externa",
+      "sociedade",
+      "publico externo",
+      "rede publica",
+      "populacao",
+      "cidadaos",
+      "moradores",
+      "empresas",
+      "organizacoes nao governamentais",
+      "escolas publicas",
+      "unidades de saude",
+      "associacao de bairro",
+      "cooperativa",
+      "sindicato",
+      "conselho municipal",
+      "instituicoes parceiras"
+    ],
+    "termos_publico_interno_impeditivo": [
+      "somente comunidade interna",
+      "apenas alunos do ifb",
+      "exclusivamente servidores",
+      "publico interno",
+      "apenas discentes",
+      "restrito a comunidade academica",
+      "sem participacao externa"
     ],
     "peso": 1
   },
 
   "bloco_5_merito": {
-    "descricao": "Avalia indicadores de qualidade e impacto da proposta (não eliminatório — gera ranking)",
+    "descricao": "Avalia indicadores de qualidade e impacto da proposta (não eliminatório — gera ranking) com base nos Art. 4º, Art. 5º, Art. 31 e manuais",
     "obrigatorio": false,
     "termos_de_merito": {
       "impacto_social": {
@@ -147,7 +289,21 @@
           "retorno a sociedade",
           "retorno para a sociedade",
           "populacao vulneravel",
-          "inclusao social"
+          "inclusao social",
+          "desenvolvimento local",
+          "desenvolvimento regional",
+          "reducao de desigualdades",
+          "direitos humanos",
+          "cidadania",
+          "emancipacao",
+          "autonomia",
+          "melhoria da qualidade de vida",
+          "justica social",
+          "equidade",
+          "participacao efetiva",
+          "dialogo com a comunidade",
+          "respeito a diversidade cultural",
+          "defesa do meio ambiente"
         ],
         "pontos_por_ocorrencia": 2,
         "max_pontos": 10
@@ -160,7 +316,16 @@
           "triade",
           "articulacao ensino",
           "integracao curriculo",
-          "creditacao"
+          "creditacao",
+          "indissociavel",
+          "articulacao com o ensino",
+          "articulacao com a pesquisa",
+          "integracao curricular",
+          "creditos de extensao",
+          "matriz curricular",
+          "projeto pedagogico",
+          "componente curricular",
+          "pratica como componente curricular"
         ],
         "pontos_por_ocorrencia": 3,
         "max_pontos": 9
@@ -172,7 +337,15 @@
           "permanencia",
           "continuidade da acao",
           "replicabilidade",
-          "multiplicadores"
+          "multiplicadores",
+          "sustentavel",
+          "escalabilidade",
+          "autossustentavel",
+          "formacao de agentes",
+          "empoderamento",
+          "apropriacao pela comunidade",
+          "legado",
+          "continuidade apos o termino"
         ],
         "pontos_por_ocorrencia": 2,
         "max_pontos": 8
@@ -185,7 +358,28 @@
           "plano de trabalho",
           "indicadores de resultado",
           "metas",
-          "avaliacao de impacto"
+          "avaliacao de impacto",
+          "diagnostico",
+          "planejamento",
+          "indicadores",
+          "avaliacao",
+          "monitoramento",
+          "relatorios",
+          "prestacao de contas",
+          "atividades",
+          "resultados esperados",
+          "produtos",
+          "oficinas",
+          "cursos",
+          "palestras",
+          "visitas tecnicas",
+          "pesquisa acao",
+          "metodologia participativa",
+          "dialogica",
+          "interdisciplinar",
+          "transdisciplinar",
+          "registro de frequencia",
+          "licoes aprendidas"
         ],
         "pontos_por_ocorrencia": 1,
         "max_pontos": 7
@@ -198,18 +392,98 @@
           "rede de parceiros",
           "interinstitucional",
           "articulacao com",
-          "colaboracao com"
+          "colaboracao com",
+          "acordo",
+          "rede",
+          "multidisciplinar",
+          "consorcio",
+          "comite",
+          "forum",
+          "conselho",
+          "instituicao parceira",
+          "fundacao de apoio",
+          "prefeitura",
+          "secretaria municipal",
+          "governo do estado"
         ],
         "pontos_por_ocorrencia": 2,
         "max_pontos": 8
+      },
+      "protagonismo_discente": {
+        "termos": [
+          "protagonismo discente",
+          "lideranca estudantil",
+          "estudantes como executores",
+          "participacao ativa dos alunos",
+          "discentes responsaveis",
+          "autonomia dos estudantes",
+          "formacao cidada",
+          "vivencia pratica"
+        ],
+        "pontos_por_ocorrencia": 2,
+        "max_pontos": 6
       }
     },
-    "pontuacao_maxima_total": 42,
+    "pontuacao_maxima_total": 48,
     "limiares": {
-      "alto_merito": 25,
-      "medio_merito": 12,
+      "alto_merito": 28,
+      "medio_merito": 14,
       "baixo_merito": 0
     },
     "peso": 0
+  },
+
+  "bloco_6_envolvimento_comunidade_externa": {
+    "descricao": "Verifica se a ação envolve diretamente a comunidade externa (Art. 7º, §2º - eliminatório se apenas comunidade interna)",
+    "obrigatorio": true,
+    "termos_positivos": [
+      "comunidade externa",
+      "publico externo",
+      "sociedade civil",
+      "populacao local",
+      "moradores do bairro",
+      "escola da rede publica",
+      "unidade basica de saude",
+      "organizacao nao governamental",
+      "associacao comunitaria",
+      "empresa local",
+      "instituicao parceira externa"
+    ],
+    "termos_negativos_impeditivos": [
+      "somente comunidade interna",
+      "apenas servidores do ifb",
+      "exclusivamente alunos do ifb",
+      "restrito a comunidade academica",
+      "sem participacao externa",
+      "apenas discentes e docentes"
+    ],
+    "peso": 1
+  },
+
+  "bloco_7_documentacao_obrigatoria": {
+    "descricao": "Verifica a presença de documentos mínimos exigidos pelo edital e manuais (Anexos, Termo de Compromisso, etc.)",
+    "obrigatorio": true,
+    "termos_positivos": [
+      "termo de compromisso assinado",
+      "declaracao de anuencia da chefia imediata",
+      "curriculum vitae do membro externo",
+      "termo de adesao ao servico voluntario",
+      "plano de trabalho detalhado",
+      "cronograma de execucao",
+      "memoria de calculo financeiro",
+      "plano de desembolso",
+      "anexos obrigatorios do edital",
+      "declaracao de regularidade fiscal",
+      "termo de parceria firmado",
+      "ata de aprovacao no colegiado"
+    ],
+    "termos_negativos_impeditivos": [
+      "ausencia de anuencia",
+      "falta termo de compromisso",
+      "documentacao incompleta",
+      "sem plano de trabalho",
+      "nao anexou curriculo"
+    ],
+    "peso": 1
   }
 }
