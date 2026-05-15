@@ -19,20 +19,7 @@ from config.settings import (
 from prex_triagem.src.pipeline import processar_proposta
 from prex_triagem.src.relatorio import inicializar_csv_consolidado
 
-#Configurar logging para o projeto.
 def configurar_logging(nivel_console: int = logging.INFO) -> None:
-    """
-    Configura o sistema de logging do programa.
-
-    Esta função define como as mensagens de log serão exibidas no console
-    e salvas em arquivo, permitindo acompanhar a execução do programa
-    durante desenvolvimento e produção.
-
-    Parâmetros:
-        nivel_console (int): Nível mínimo de mensagens mostradas no console.
-                            Padrão: logging.INFO (mostra INFO, WARNING, ERROR).
-                            Se VERBOSE=True, mostra DEBUG.
-    """
 
     ARQUIVO_LOG.parent.mkdir(parents=True, exist_ok=True)
 
@@ -57,21 +44,8 @@ def configurar_logging(nivel_console: int = logging.INFO) -> None:
     logging.getLogger("pdfplumber").setLevel(logging.WARNING)
     logging.getLogger("PyPDF2").setLevel(logging.WARNING)
 
-#Carregar a biblioteca de termos.
 def carregar_biblioteca(caminho: Path) -> dict:
-    """
-    Carrega a biblioteca de termos de validação a partir de um arquivo JSON.
 
-    Esta função lê o arquivo 'biblioteca_termos.json' que contém os termos
-    positivos, negativos e de alerta para cada bloco de validação.
-    Se o arquivo não existir ou for inválido, o programa é encerrado.
-
-    Parâmetros:
-        caminho (Path): Caminho absoluto para o arquivo JSON da biblioteca.
-
-    Retorna:
-        dict: Dicionário com os dados da biblioteca carregados.
-    """
     if not caminho.exists():
         logging.critical(
             "Arquivo de biblioteca não encontrado: %s\n"
@@ -91,21 +65,7 @@ def carregar_biblioteca(caminho: Path) -> dict:
         )
         sys.exit(1)
 
-#Listar os arquivos PDF na pasta especificada.
 def listar_pdfs(pasta: Path) -> list[Path]:
-    """
-    Lista todos os arquivos PDF válidos em uma pasta específica.
-
-    Esta função verifica a pasta definida em settings.py (normalmente 'data/pdfs_entrada')
-    e retorna uma lista ordenada de caminhos para arquivos PDF.
-    Apenas extensões aceitas (definidas em EXTENSOES_ACEITAS) são incluídas.
-
-    Parâmetros:
-        pasta (Path): Caminho para a pasta onde buscar os PDFs.
-
-    Retorna:
-        list[Path]: Lista de caminhos absolutos para os arquivos PDF encontrados.
-    """
 
     if not pasta.exists():
         logging.warning(
@@ -123,35 +83,16 @@ def listar_pdfs(pasta: Path) -> list[Path]:
     logging.info("PDFs encontrados em '%s': %d arquivo(s).", pasta, len(pdfs))
     return pdfs
 
-# Listar relatórios individuais gerados.
 def listar_relatorios_individuais(pasta_relatorios: Path) -> list[Path]:
-    """
-    Lista todos os relatórios individuais em TXT gerados na pasta.
-    
-    Parâmetros:
-        pasta_relatorios (Path): Caminho da pasta de relatórios.
-    
-    Retorna:
-        list[Path]: Lista de caminhos para os arquivos *_relatorio.txt encontrados.
-    """
+
     if not pasta_relatorios.exists():
         return []
     
     relatorios = sorted(pasta_relatorios.glob("*_relatorio.txt"))
     return relatorios
 
-# Exibir resultado final da triagem, incluindo estatísticas e ranking.
 def exibir_resumo_final(resultados: list[dict], pasta_relatorios: Path = None) -> None:
-    """
-    Exibe o resumo final da triagem com estatísticas globais e lista limitada de pareceres.
-    
-    Mostra apenas estatísticas gerais (aptos, alertas, inaptos) e os primeiros 5 pareceres
-    individuais gerados, evitando inundação do terminal.
-    
-    Parâmetros:
-        resultados (list[dict]): Lista com os resultados de todas as propostas.
-        pasta_relatorios (Path): Caminho da pasta de relatórios para listar pareceres.
-    """
+
     total = len(resultados)
     aptos = sum(1 for r in resultados if r["status"] == "APTO")
     alertas = sum(1 for r in resultados if r["status"] == "ALERTA")
@@ -171,7 +112,6 @@ def exibir_resumo_final(resultados: list[dict], pasta_relatorios: Path = None) -
         print("\n  📄 Pareceres Individuais Gerados:")
         print("-" * 70)
         if relatorios_gerados:
-            # Mostrar apenas os primeiros 5 para evitar inundação
             max_exibir = 5
             for relatorio in relatorios_gerados[:max_exibir]:
                 print(f"     • {relatorio.name}")
@@ -188,13 +128,6 @@ def exibir_resumo_final(resultados: list[dict], pasta_relatorios: Path = None) -
     print("=" * 70)
 
 def main() -> None:
-    """
-    Função principal do programa de triagem de editais PREX/IFB.
-    
-    Coordena o carregamento da biblioteca, listagem dos PDFs, processamento
-    individual de cada proposta (gerando pareceres em TXT) e exibição
-    das estatísticas globais ao final.
-    """
 
     configurar_logging()
     logger = logging.getLogger(__name__)

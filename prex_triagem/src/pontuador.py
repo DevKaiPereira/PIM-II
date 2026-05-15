@@ -82,19 +82,7 @@ def calcular_pontuacao_merito(
 
 
 def avaliar_status_burocratico(**aprovacoes: bool) -> dict[str, Any]:
-    """Avalia os quatro portões burocráticos e retorna status e motivos.
-
-    Uso sugerido:
-      resultado = avaliar_status_burocratico(
-          bloco1=aprovado_b1,
-          bloco2=aprovado_b2,
-          bloco3=aprovado_b3,
-          bloco4=aprovado_b4,
-      )
-
-    Retorna dicionário com 'status' = 'APTO'|'INAPTO' e 'falhas' = lista de blocos reprovados.
-    """
-    # Normalizar nomes dos blocos para mensagens legíveis
+  
     nome_map = {
         "bloco1": "Bloco 1 - Exercício Pleno",
         "bloco2": "Bloco 2 - Vínculo Institucional",
