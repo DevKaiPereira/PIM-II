@@ -26,10 +26,12 @@ ICONE_STATUS = {
 }
 
 NOMES_BLOCOS = {
-    "bloco_1": "Bloco 1 — Exercício Pleno",
-    "bloco_2": "Bloco 2 — Vínculo Institucional",
-    "bloco_3": "Bloco 3 — Composição da Equipe",
-    "bloco_4": "Bloco 4 — Aderência ao Edital",
+    "P1": "Pilar 1 — Admissibilidade e Vínculo",
+    "P2": "Pilar 2 — Configuração de Equipe",
+    "P3": "Pilar 3 — Dimensão Pedagógica",
+    "P4": "Pilar 4 — Enquadramento Estratégico",
+    "P5": "Pilar 5 — Recursos e Viabilidade",
+    "P6": "Pilar 6 — Conformidade Documental",
 }
 
 
@@ -175,7 +177,7 @@ def gerar_relatorio_individual(
 
     # --- RENDERIZAÇÃO DO MÉRITO (Detalhes) ---
     linhas += [
-        "📊  Bloco 5 — Mérito e Qualidade",
+        "📊  Avaliação de Mérito e Qualidade",
         SEPARADOR_FINO,
         f"   Pontuação obtida    : {resultado_merito.get('pontuacao_total', 0)} / "
         f"{resultado_merito.get('pontuacao_maxima', 42)} pontos",
@@ -223,14 +225,18 @@ def inicializar_csv_consolidado(caminho_csv: Path) -> None:
         writer.writerow([
             "arquivo",
             "status",
-            "bloco1_aprovado",
-            "bloco1_impedimentos",
-            "bloco2_aprovado",
-            "bloco2_alertas",
-            "bloco3_aprovado",
-            "bloco3_impedimentos",
-            "bloco4_aprovado",
-            "bloco4_alertas",
+            "p1_aprovado",
+            "p1_impedimentos",
+            "p2_aprovado",
+            "p2_alertas",
+            "p3_aprovado",
+            "p3_impedimentos",
+            "p4_aprovado",
+            "p4_alertas",
+            "p5_aprovado",
+            "p5_alertas",
+            "p6_aprovado",
+            "p6_impedimentos",
             "pontuacao_merito",
             "classificacao_merito",
             "data_analise",
@@ -259,14 +265,18 @@ def registrar_no_csv_consolidado(
     linha = [
         nome_arquivo,
         status,
-        resultados_blocos.get("bloco_1", {}).get("aprovado", False),
-        _imp("bloco_1"),
-        resultados_blocos.get("bloco_2", {}).get("aprovado", False),
-        _ale("bloco_2"),
-        resultados_blocos.get("bloco_3", {}).get("aprovado", False),
-        _imp("bloco_3"),
-        resultados_blocos.get("bloco_4", {}).get("aprovado", False),
-        _ale("bloco_4"),
+        resultados_blocos.get("P1", {}).get("aprovado", False),
+        _imp("P1"),
+        resultados_blocos.get("P2", {}).get("aprovado", False),
+        _ale("P2"),
+        resultados_blocos.get("P3", {}).get("aprovado", False),
+        _imp("P3"),
+        resultados_blocos.get("P4", {}).get("aprovado", False),
+        _ale("P4"),
+        resultados_blocos.get("P5", {}).get("aprovado", False),
+        _ale("P5"),
+        resultados_blocos.get("P6", {}).get("aprovado", False),
+        _imp("P6"),
         resultado_merito.get("pontuacao_total", 0),
         resultado_merito.get("classificacao", ""),
         agora,
