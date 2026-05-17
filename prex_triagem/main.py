@@ -3,6 +3,9 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
+import unicodedata
+import textwrap
+from typing import List, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -11,13 +14,24 @@ from config.settings import (
     PASTA_RELATORIOS,
     ARQUIVO_BIBLIOTECA,
     RELATORIO_CONSOLIDADO,
+    # ARQUIVO_LOG, # Removed from here, defined globally below
+    # EXTENSOES_ACEITAS, # Removed from here, defined globally below
+    # VERBOSE, # Removed from here, defined globally below
     ARQUIVO_LOG,
     EXTENSOES_ACEITAS,
-    MAX_COORDENADORES,
     VERBOSE,
 )
 from prex_triagem.src.pipeline import processar_proposta
-from prex_triagem.src.relatorio import inicializar_csv_consolidado
+from prex_triagem.src.relatorio import inicializar_csv_consolidado # Keep this for CSV
+
+# Importar reportlab para consolidar PDFs
+try:
+    from reportlab.lib.pagesizes import A4
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.units import inch
+    REPORTLAB_DISPONIVEL = True
+except ImportError:
+    REPORTLAB_DISPONIVEL = False
 
 def configurar_logging(nivel_console: int = logging.INFO) -> None:
 
@@ -43,6 +57,8 @@ def configurar_logging(nivel_console: int = logging.INFO) -> None:
     logging.getLogger("pdfminer").setLevel(logging.WARNING)
     logging.getLogger("pdfplumber").setLevel(logging.WARNING)
     logging.getLogger("PyPDF2").setLevel(logging.WARNING)
+    
+logger = logging.getLogger(__name__)
 
 def carregar_biblioteca(caminho: Path) -> dict:
 
@@ -83,15 +99,60 @@ def listar_pdfs(pasta: Path) -> list[Path]:
     logging.info("PDFs encontrados em '%s': %d arquivo(s).", pasta, len(pdfs))
     return pdfs
 
-def listar_relatorios_individuais(pasta_relatorios: Path) -> list[Path]:
+def gerar_pdf_consolidado_a_partir_de_conteudo(
+    todos_conteudos_relatorios: List[List[str]], caminho_saida: Path
+) -> Optional[Path]:
+    """
+    Gera um único PDF a partir de uma lista de conteúdos de relatórios (listas de strings).
+    """
+    if not REPORTLAB_DISPONIVEL:
+        logger.error("reportlab não está instalado. Não é possível gerar o PDF consolidado.")
+        return None
 
-    if not pasta_relatorios.exists():
-        return []
-    
-    relatorios = sorted(pasta_relatorios.glob("*_relatorio.txt"))
-    return relatorios
+    if not todos_conteudos_relatorios:
+        logger.info("Nenhum conteúdo de relatório para consolidar.")
+        return None
+    try:
+        caminho_saida.parent.mkdir(parents=True, exist_ok=True)
 
-def exibir_resumo_final(resultados: list[dict], pasta_relatorios: Path = None) -> None:
+        pagina_largura, pagina_altura = A4
+        margem = 0.5 * inch
+        fonte = "Courier"
+        tamanho_fonte = 9
+        altura_linha = tamanho_fonte + 2
+        largura_wrap = int((pagina_largura - 2 * margem) / (tamanho_fonte * 0.6))
+
+        c = canvas.Canvas(str(caminho_saida), pagesize=A4)
+        c.setFont(fonte, tamanho_fonte)
+
+        for i, linhas_relatorio in enumerate(todos_conteudos_relatorios):
+            if i > 0:
+                c.showPage()
+                c.setFont(fonte, tamanho_fonte)
+            
+            y = pagina_altura - margem
+
+            for linha in linhas_relatorio:
+                linha_sanitizada = unicodedata.normalize("NFKD", linha).encode("ascii", "ignore").decode("ascii")
+                partes = textwrap.wrap(linha_sanitizada, width=largura_wrap) or [""]
+
+                for parte in partes:
+                    if y < margem:
+                        c.showPage()
+                        c.setFont(fonte, tamanho_fonte)
+                        y = pagina_altura - margem
+
+                    c.drawString(margem, y, parte)
+                    y -= altura_linha
+
+        c.save()
+        logger.info("PDF consolidado gerado em: %s", caminho_saida.resolve())
+        return caminho_saida
+    except Exception as e:
+        logger.error("Erro ao salvar o PDF consolidado em '%s': %s", caminho_saida, e)
+        return None
+
+def exibir_resumo_final(resultados: list[dict], caminho_pdf_consolidado: Optional[Path] = None) -> None:
 
     total = len(resultados)
     aptos = sum(1 for r in resultados if r["status"] == "APTO")
@@ -107,22 +168,9 @@ def exibir_resumo_final(resultados: list[dict], pasta_relatorios: Path = None) -
     print(f"  ❌ INAPTAS                      : {inaptos}")
     print("=" * 70)
 
-    if pasta_relatorios:
-        relatorios_gerados = listar_relatorios_individuais(pasta_relatorios)
-        print("\n  📄 Pareceres Individuais Gerados:")
-        print("-" * 70)
-        if relatorios_gerados:
-            max_exibir = 5
-            for relatorio in relatorios_gerados[:max_exibir]:
-                print(f"     • {relatorio.name}")
-            
-            restantes = len(relatorios_gerados) - max_exibir
-            if restantes > 0:
-                print(f"     ... e mais {restantes} parecer(es) salvo(s) no disco")
-        else:
-            print("     (nenhum parecer encontrado)")
-
-    print("\n  📁 Arquivos salvos em: relatorios/")
+    if caminho_pdf_consolidado:
+        print(f"\n  📦 PDF Consolidado de Relatórios: {caminho_pdf_consolidado.resolve()}")
+    print(f"\n  📁 Arquivos salvos em: {PASTA_RELATORIOS.resolve()}/")
     print(f"  📊 Relatório consolidado (CSV): {RELATORIO_CONSOLIDADO}")
     print(f"  📝 Log completo: {ARQUIVO_LOG}")
     print("=" * 70)
@@ -161,6 +209,7 @@ def main() -> None:
     inicializar_csv_consolidado(RELATORIO_CONSOLIDADO)
 
     resultados = []
+    todos_conteudos_relatorios: List[List[str]] = []
     for indice, caminho_pdf in enumerate(pdfs, start=1):
         print(f"  [{indice:>3}/{len(pdfs)}] Analisando: {caminho_pdf.name}")
 
@@ -169,10 +218,11 @@ def main() -> None:
             biblioteca=biblioteca,
             pasta_relatorios=PASTA_RELATORIOS,
             caminho_csv_consolidado=RELATORIO_CONSOLIDADO,
-            max_coordenadores=MAX_COORDENADORES,
         )
 
         if resultado:
+            if resultado.get("report_content"):
+                todos_conteudos_relatorios.append(resultado["report_content"])
             resultados.append(resultado)
 
     fim = datetime.now()
@@ -182,8 +232,15 @@ def main() -> None:
         "TRIAGEM CONCLUÍDA em %.1f segundos. %d/%d propostas processadas.",
         duracao, len(resultados), len(pdfs)
     )
+    
+    # Consolidar todos os PDFs individuais em um único arquivo
+    caminho_pdf_consolidado = None
+    if todos_conteudos_relatorios:
+        nome_consolidado = f"relatorio_consolidado_{fim.strftime('%Y%m%d_%H%M%S')}.pdf"
+        caminho_pdf_consolidado = PASTA_RELATORIOS / nome_consolidado
+        caminho_pdf_consolidado = gerar_pdf_consolidado_a_partir_de_conteudo(todos_conteudos_relatorios, caminho_pdf_consolidado)
 
-    exibir_resumo_final(resultados, PASTA_RELATORIOS)
+    exibir_resumo_final(resultados, caminho_pdf_consolidado)
     
     print(f"\n  ⏱️  Tempo total: {duracao:.1f} segundos\n")
 

@@ -115,20 +115,3 @@ def calcular_pontuacao_merito(
         "classificacao": classificacao,
         "detalhes_categorias": detalhes,
     }
-
-
-def avaliar_status_burocratico(**aprovacoes: bool) -> dict[str, Any]:
-  
-    nome_map = {
-        "bloco1": "Bloco 1 - Exercício Pleno",
-        "bloco2": "Bloco 2 - Vínculo Institucional",
-        "bloco3": "Bloco 3 - Composição da Equipe",
-        "bloco4": "Bloco 4 - Aderência ao Edital",
-    }
-
-    falhas = [nome_map.get(k, k) for k, v in aprovacoes.items() if not v]
-    status = "APTO" if not falhas else "INAPTO"
-
-    logger.info("Avaliação burocrática: %s. Falhas: %s", status, falhas)
-
-    return {"status": status, "falhas": falhas}

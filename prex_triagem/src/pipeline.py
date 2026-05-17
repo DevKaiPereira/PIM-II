@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from prex_triagem.src.extrator import preparar_documento
-from prex_triagem.src.validador import validar_todos_os_blocos
+from prex_triagem.src.validador import validar_todos_os_pilares
 from prex_triagem.src.pontuador import calcular_pontuacao_merito
 from prex_triagem.src.relatorio import (
     determinar_status,
@@ -19,7 +19,6 @@ def processar_proposta(
     biblioteca: dict[str, Any],
     pasta_relatorios: Path,
     caminho_csv_consolidado: Path,
-    max_coordenadores: int = 1,
 ) -> Optional[dict[str, Any]]:
  
     nome_arquivo = caminho_pdf.name
@@ -41,14 +40,14 @@ def processar_proposta(
             nome_arquivo, len(texto_normalizado)
         )
 
-    resultados_blocos = validar_todos_os_blocos(
-        texto_normalizado, biblioteca, max_coordenadores=max_coordenadores
+    resultados_blocos = validar_todos_os_pilares(
+        texto_normalizado, biblioteca
     )
 
     config_bloco5 = biblioteca.get("bloco_5_merito", {})
     resultado_merito = calcular_pontuacao_merito(texto_normalizado, config_bloco5)
 
-    caminho_relatorio = gerar_relatorio_individual(
+    report_content = gerar_relatorio_individual(
         nome_arquivo=nome_arquivo,
         resultados_blocos=resultados_blocos,
         resultado_merito=resultado_merito,
@@ -68,11 +67,8 @@ def processar_proposta(
 
     print(
         f"  {icone} {status:<8} | "
-        f"Mérito: {resultado_merito['pontuacao_total']:>3}pts "
-        f"({resultado_merito['classificacao']}) | "
-        f"{nome_arquivo}"
+        f"Mérito: {resultado_merito['pontuacao_total']:>3}pts ({resultado_merito['classificacao']}) | {nome_arquivo}"
     )
-
     logger.info(
         "<<< Triagem concluída: %s | Status: %s | Mérito: %d pts",
         nome_arquivo, status, resultado_merito["pontuacao_total"]
@@ -83,5 +79,5 @@ def processar_proposta(
         "status": status,
         "pontuacao_merito": resultado_merito["pontuacao_total"],
         "classificacao_merito": resultado_merito["classificacao"],
-        "caminho_relatorio": str(caminho_relatorio),
+        "report_content": report_content,
     }
