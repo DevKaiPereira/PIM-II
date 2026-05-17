@@ -20,63 +20,24 @@ SEPARADOR = "=" * 70
 SEPARADOR_FINO = "-" * 70
 
 NOMES_BLOCOS = {
-    "bloco_1": "Bloco 1 — Exercício Pleno",
-    "bloco_2": "Bloco 2 — Vínculo Institucional",
-    "bloco_3": "Bloco 3 — Composição da Equipe",
-    "bloco_4": "Bloco 4 — Aderência ao Edital",
+    "P1": "Pilar 1 — Admissibilidade e Vínculo",
+    "P2": "Pilar 2 — Configuração de Equipe",
+    "P3": "Pilar 3 — Dimensão Pedagógica",
+    "P4": "Pilar 4 — Enquadramento Estratégico",
+    "P5": "Pilar 5 — Recursos e Viabilidade",
+    "P6": "Pilar 6 — Conformidade Documental",
 }
 
-
-def _sanitizar_texto_para_pdf(texto: str) -> str:
-    if not texto:
-        return ""
-    texto = unicodedata.normalize("NFKD", texto)
-    texto = texto.encode("ascii", "ignore").decode("ascii")
-    return texto
-
-
-def _gerar_pdf_relatorio(linhas: list[str], caminho_pdf: Path) -> bool:
-    if not REPORTLAB_DISPONIVEL:
-        logger.warning(
-            "reportlab não instalado; pulando geração de PDF (%s)",
-            caminho_pdf.name,
-        )
-        return False
-
-    pagina_largura, pagina_altura = A4
-    margem = 36  # 0.5 in
-    fonte = "Courier"
-    tamanho_fonte = 9
-    altura_linha = tamanho_fonte + 2
-
-    c = canvas.Canvas(str(caminho_pdf), pagesize=A4)
-    c.setFont(fonte, tamanho_fonte)
-
-    y = pagina_altura - margem
-
-    largura_wrap = 110
-
-    for linha in linhas:
-        linha = _sanitizar_texto_para_pdf(linha)
-        partes = textwrap.wrap(linha, width=largura_wrap) or [""]
-
-        for parte in partes:
-            if y < margem:
-                c.showPage()
-                c.setFont(fonte, tamanho_fonte)
-                y = pagina_altura - margem
-
-            c.drawString(margem, y, parte)
-            y -= altura_linha
-
-    c.save()
-    return True
+logger = logging.getLogger(__name__)
 
 def gerar_relatorio_individual(
     nome_arquivo: str,
     resultados_blocos: dict[str, Any],
     resultado_merito: dict[str, Any],
     pasta_saida: Path,
+) -> list[str]:
+
+    status = determinar_status(resultados_blocos, resultado_merito) # Mantido apenas para logs internos
     pasta_saida_pdf: Path | None = None,
 ) -> Path:
 
@@ -85,22 +46,50 @@ def gerar_relatorio_individual(
     caminho_saida = pasta_saida / nome_relatorio
 
     linhas = []
+    
+    # Pega a classificação de mérito para brilhar no topo
+    classificacao_merito = resultado_merito.get('classificacao', 'NÃO AVALIADO').upper()
 
     linhas += [
         SEPARADOR,
-        "  SISTEMA DE TRIAGEM DE EDITAIS — PREX/IFB",
+        "  PARECER CONSULTIVO DA MÁQUINA — PREX/IFB",
         "  Base legal: Resolução nº 42/2020",
         SEPARADOR,
-        f"  Proposta analisada : {nome_arquivo}",
+        f"  Proposta analisada  : {nome_arquivo}",
         f"  Data/hora da análise: {agora}",
+        SEPARADOR,
+        f"  CLASSIFICAÇÃO DE MÉRITO: {classificacao_merito} 🌟",
         SEPARADOR,
         "",
     ]
 
+    # --- NOVO PAINEL INTELIGENTE DE ATENÇÃO PARA A EQUIPE ---
+    avisos_topo = []
+    for chave_bloco, nome_bloco in NOMES_BLOCOS.items():
+        resultado = resultados_blocos.get(chave_bloco, {})
+        for imp in resultado.get("impedimentos", []):
+            avisos_topo.append(f"- A máquina detectou a palavra '{imp}' no {nome_bloco}. Requer leitura humana rápida para confirmar contexto.")
+        for alerta in resultado.get("alertas", []):
+            avisos_topo.append(f"- Alerta no {nome_bloco}: {alerta}")
+
+    if avisos_topo:
+        linhas.append("  ATENÇÃO DA EQUIPE DE AVALIAÇÃO:")
+        for aviso in avisos_topo:
+            linhas.append(f"  {aviso}")
+    else:
+        linhas.append("  ATENÇÃO DA EQUIPE: A máquina não detectou palavras impeditivas. Documentação base parece regular.")
+    
+    linhas.append(SEPARADOR_FINO)
+    linhas.append("")
+    linhas.append("  DETALHAMENTO DA VARREDURA TÉCNICA:")
+    linhas.append("")
+
+    # --- RENDERIZAÇÃO DOS BLOCOS (Mantida igual ao original) ---
     for chave_bloco, nome_bloco in NOMES_BLOCOS.items():
         resultado = resultados_blocos.get(chave_bloco, {})
         aprovado = resultado.get("aprovado", False)
-        icone = "✅" if aprovado else "❌"
+        # O ícone muda para um aviso se tiver impedimentos, mas não diz mais "Reprovado"
+        icone = "✅" if aprovado else "⚠️"
 
         linhas += [
             f"{icone}  {nome_bloco}",
@@ -121,24 +110,24 @@ def gerar_relatorio_individual(
             linhas.append(f"   ⚠️  Alerta            : {alerta}")
 
         for imp in resultado.get("impedimentos", []):
-            linhas.append(f"   🚫 IMPEDIMENTO       : {imp}")
+            linhas.append(f"   🛑 Termo Impeditivo  : {imp}")
 
         linhas.append("")
 
+    # --- RENDERIZAÇÃO DO MÉRITO (Detalhes) ---
     linhas += [
-        "📊  Bloco 5 — Mérito e Qualidade (não eliminatório)",
+        "📊  Avaliação de Mérito e Qualidade",
         SEPARADOR_FINO,
-        f"   Pontuação obtida    : {resultado_merito['pontuacao_total']} / "
-        f"{resultado_merito['pontuacao_maxima']} pontos",
-        f"   Classificação       : {resultado_merito['classificacao']}",
+        f"   Pontuação obtida    : {resultado_merito.get('pontuacao_total', 0)} / "
+        f"{resultado_merito.get('pontuacao_maxima', 42)} pontos",
         "",
         "   Detalhamento por categoria:",
     ]
 
     for categoria, detalhe in resultado_merito.get("detalhes_categorias", {}).items():
         nome_cat = categoria.replace("_", " ").title()
-        pontos = detalhe["pontos_obtidos"]
-        maximo = detalhe["max_pontos"]
+        pontos = detalhe.get("pontos_obtidos", 0)
+        maximo = detalhe.get("max_pontos", 0)
         termos_cat = [t["termo"] for t in detalhe.get("termos_encontrados", [])]
         termos_str = ", ".join(termos_cat) if termos_cat else "—"
         linhas.append(
@@ -150,10 +139,12 @@ def gerar_relatorio_individual(
         "",
         SEPARADOR,
         "  ⚠️  AVISO: Este relatório é uma ferramenta de APOIO à triagem.",
-        "  O resultado final é de responsabilidade dos avaliadores da PREX/IFB.",
+        "  A decisão final de admissibilidade é humana, de responsabilidade da PREX/IFB.",
         SEPARADOR,
     ]
 
+    logger.debug("Conteúdo do relatório individual gerado para '%s'.", nome_arquivo)
+    return linhas
     pasta_saida.mkdir(parents=True, exist_ok=True)
     caminho_saida.write_text("\n".join(linhas), encoding="utf-8")
 
@@ -174,6 +165,19 @@ def inicializar_csv_consolidado(caminho_csv: Path) -> None:
         writer = csv.writer(f)
         writer.writerow([
             "arquivo",
+            "status",
+            "p1_aprovado",
+            "p1_impedimentos",
+            "p2_aprovado",
+            "p2_alertas",
+            "p3_aprovado",
+            "p3_impedimentos",
+            "p4_aprovado",
+            "p4_alertas",
+            "p5_aprovado",
+            "p5_alertas",
+            "p6_aprovado",
+            "p6_impedimentos",
             "bloco1_aprovado",
             "bloco1_impedimentos",
             "bloco2_aprovado",
@@ -208,6 +212,19 @@ def registrar_no_csv_consolidado(
 
     linha = [
         nome_arquivo,
+        status,
+        resultados_blocos.get("P1", {}).get("aprovado", False),
+        _imp("P1"),
+        resultados_blocos.get("P2", {}).get("aprovado", False),
+        _ale("P2"),
+        resultados_blocos.get("P3", {}).get("aprovado", False),
+        _imp("P3"),
+        resultados_blocos.get("P4", {}).get("aprovado", False),
+        _ale("P4"),
+        resultados_blocos.get("P5", {}).get("aprovado", False),
+        _ale("P5"),
+        resultados_blocos.get("P6", {}).get("aprovado", False),
+        _imp("P6"),
         resultados_blocos.get("bloco_1", {}).get("aprovado", False),
         _imp("bloco_1"),
         resultados_blocos.get("bloco_2", {}).get("aprovado", False),
