@@ -6,14 +6,18 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+logger = logging.getLogger(__name__)
+
+try:
+    from reportlab.lib.pagesizes import A4
+    from reportlab.pdfgen import canvas
+
+    REPORTLAB_DISPONIVEL = True
+except ImportError:  
+    REPORTLAB_DISPONIVEL = False
+
 SEPARADOR = "=" * 70
 SEPARADOR_FINO = "-" * 70
-
-ICONE_STATUS = {
-    "APTO": "✅ APTO",
-    "ALERTA": "⚠️  ALERTA",
-    "INAPTO": "❌ INAPTO",
-}
 
 NOMES_BLOCOS = {
     "P1": "Pilar 1 — Admissibilidade e Vínculo",
@@ -26,21 +30,6 @@ NOMES_BLOCOS = {
 
 logger = logging.getLogger(__name__)
 
-def determinar_status(
-    resultados_blocos: dict[str, Any],
-    resultado_merito: dict[str, Any],
-) -> str:
-
-    for nome_bloco, resultado in resultados_blocos.items():
-        if resultado.get("impedimentos"):
-            return "INAPTO"
-
-    for nome_bloco, resultado in resultados_blocos.items():
-        if not resultado.get("aprovado", False):
-            return "ALERTA"
-
-    return "APTO"
-
 def gerar_relatorio_individual(
     nome_arquivo: str,
     resultados_blocos: dict[str, Any],
@@ -49,6 +38,9 @@ def gerar_relatorio_individual(
 ) -> list[str]:
 
     status = determinar_status(resultados_blocos, resultado_merito) # Mantido apenas para logs internos
+    pasta_saida_pdf: Path | None = None,
+) -> Path:
+
     agora = datetime.now().strftime("%d/%m/%Y às %H:%M:%S")
     nome_relatorio = f"{Path(nome_arquivo).stem}_relatorio.txt"
     caminho_saida = pasta_saida / nome_relatorio
@@ -68,6 +60,7 @@ def gerar_relatorio_individual(
         SEPARADOR,
         f"  CLASSIFICAÇÃO DE MÉRITO: {classificacao_merito} 🌟",
         SEPARADOR,
+        "",
     ]
 
     # --- NOVO PAINEL INTELIGENTE DE ATENÇÃO PARA A EQUIPE ---
@@ -152,6 +145,18 @@ def gerar_relatorio_individual(
 
     logger.debug("Conteúdo do relatório individual gerado para '%s'.", nome_arquivo)
     return linhas
+    pasta_saida.mkdir(parents=True, exist_ok=True)
+    caminho_saida.write_text("\n".join(linhas), encoding="utf-8")
+
+    pasta_pdf = pasta_saida_pdf or pasta_saida
+    pasta_pdf.mkdir(parents=True, exist_ok=True)
+    caminho_pdf = pasta_pdf / f"{Path(nome_arquivo).stem}_relatorio.pdf"
+    pdf_ok = _gerar_pdf_relatorio(linhas, caminho_pdf)
+
+    logger.info("Relatório individual gerado: %s", caminho_saida)
+    if pdf_ok:
+        logger.info("Relatório PDF gerado: %s", caminho_pdf)
+    return caminho_saida
 
 def inicializar_csv_consolidado(caminho_csv: Path) -> None:
 
@@ -173,6 +178,14 @@ def inicializar_csv_consolidado(caminho_csv: Path) -> None:
             "p5_alertas",
             "p6_aprovado",
             "p6_impedimentos",
+            "bloco1_aprovado",
+            "bloco1_impedimentos",
+            "bloco2_aprovado",
+            "bloco2_alertas",
+            "bloco3_aprovado",
+            "bloco3_impedimentos",
+            "bloco4_aprovado",
+            "bloco4_alertas",
             "pontuacao_merito",
             "classificacao_merito",
             "data_analise",
@@ -187,7 +200,6 @@ def registrar_no_csv_consolidado(
     resultado_merito: dict[str, Any],
 ) -> None:
 
-    status = determinar_status(resultados_blocos, resultado_merito)
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
     def _imp(bloco_key: str) -> str:
@@ -213,6 +225,14 @@ def registrar_no_csv_consolidado(
         _ale("P5"),
         resultados_blocos.get("P6", {}).get("aprovado", False),
         _imp("P6"),
+        resultados_blocos.get("bloco_1", {}).get("aprovado", False),
+        _imp("bloco_1"),
+        resultados_blocos.get("bloco_2", {}).get("aprovado", False),
+        _ale("bloco_2"),
+        resultados_blocos.get("bloco_3", {}).get("aprovado", False),
+        _imp("bloco_3"),
+        resultados_blocos.get("bloco_4", {}).get("aprovado", False),
+        _ale("bloco_4"),
         resultado_merito.get("pontuacao_total", 0),
         resultado_merito.get("classificacao", ""),
         agora,
@@ -222,4 +242,4 @@ def registrar_no_csv_consolidado(
         writer = csv.writer(f)
         writer.writerow(linha)
 
-    logger.debug("Registrado no CSV: %s — %s", nome_arquivo, status)
+    logger.debug("Registrado no CSV: %s", nome_arquivo)

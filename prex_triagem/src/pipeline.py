@@ -6,7 +6,6 @@ from prex_triagem.src.extrator import preparar_documento
 from prex_triagem.src.validador import validar_todos_os_pilares
 from prex_triagem.src.pontuador import calcular_pontuacao_merito
 from prex_triagem.src.relatorio import (
-    determinar_status,
     gerar_relatorio_individual,
     registrar_no_csv_consolidado,
 )
@@ -18,6 +17,7 @@ def processar_proposta(
     caminho_pdf: Path,
     biblioteca: dict[str, Any],
     pasta_relatorios: Path,
+    pasta_relatorios_pdf: Path,
     caminho_csv_consolidado: Path,
 ) -> Optional[dict[str, Any]]:
  
@@ -52,6 +52,7 @@ def processar_proposta(
         resultados_blocos=resultados_blocos,
         resultado_merito=resultado_merito,
         pasta_saida=pasta_relatorios,
+        pasta_saida_pdf=pasta_relatorios_pdf,
     )
 
     registrar_no_csv_consolidado(
@@ -62,21 +63,20 @@ def processar_proposta(
     )
 
 
-    status = determinar_status(resultados_blocos, resultado_merito)
-    icone = {"APTO": "✅", "ALERTA": "⚠️ ", "INAPTO": "❌"}.get(status, "?")
-
     print(
         f"  {icone} {status:<8} | "
         f"Mérito: {resultado_merito['pontuacao_total']:>3}pts ({resultado_merito['classificacao']}) | {nome_arquivo}"
+        f"Mérito: {resultado_merito['pontuacao_total']:>3}pts "
+        f"({resultado_merito['classificacao']}) | "
+        f"{nome_arquivo}"
     )
     logger.info(
-        "<<< Triagem concluída: %s | Status: %s | Mérito: %d pts",
-        nome_arquivo, status, resultado_merito["pontuacao_total"]
+        "<<< Triagem concluída: %s | Mérito: %d pts",
+        nome_arquivo, resultado_merito["pontuacao_total"]
     )
 
     return {
         "arquivo": nome_arquivo,
-        "status": status,
         "pontuacao_merito": resultado_merito["pontuacao_total"],
         "classificacao_merito": resultado_merito["classificacao"],
         "report_content": report_content,
