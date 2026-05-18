@@ -94,8 +94,8 @@ python3 -m prex_triagem
 Se você estiver no macOS/Linux, também pode usar:
 
 ```bash
-make run      # roda e mostra no terminal
-make run-txt  # roda e salva em resultado.txt
+make run     
+make run-txt 
 ```
 
 Esse comando executa o processo de triagem e exibe o resultado diretamente no terminal. Para salvar a saída em arquivo, utilize o redirecionamento para `resultado.txt`.
