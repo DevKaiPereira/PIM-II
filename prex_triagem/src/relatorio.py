@@ -35,10 +35,7 @@ def gerar_relatorio_individual(
     resultados_blocos: dict[str, Any],
     resultado_merito: dict[str, Any],
     pasta_saida: Path,
-) -> list[str]:
-
-    status = determinar_status(resultados_blocos, resultado_merito) # Mantido apenas para logs internos
-    pasta_saida_pdf: Path | None = None,
+    pasta_saida_pdf: Path | None = None
 ) -> Path:
 
     agora = datetime.now().strftime("%d/%m/%Y às %H:%M:%S")
@@ -144,7 +141,7 @@ def gerar_relatorio_individual(
     ]
 
     logger.debug("Conteúdo do relatório individual gerado para '%s'.", nome_arquivo)
-    return linhas
+
     pasta_saida.mkdir(parents=True, exist_ok=True)
     caminho_saida.write_text("\n".join(linhas), encoding="utf-8")
 
@@ -200,6 +197,7 @@ def registrar_no_csv_consolidado(
     resultado_merito: dict[str, Any],
 ) -> None:
 
+    status = "Processado"
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
     def _imp(bloco_key: str) -> str:

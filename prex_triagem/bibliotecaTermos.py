@@ -1,4 +1,4 @@
-{
+biblioteca_termos = {
   "_meta": {
     "versao": "3.0",
     "base_legal": "Resolução nº 42/2020 — IFB e Manuais SUAP PREX (submissão e gerenciamento)",

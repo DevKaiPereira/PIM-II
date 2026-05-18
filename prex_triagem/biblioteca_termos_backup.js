@@ -1,4 +1,4 @@
-{
+const bibliotecaTermosBackup = {
   "pillars": [
     {
       "id": "P1",
@@ -1171,4 +1171,6 @@
       ]
     }
   ]
-}
+};
+
+module.exports = bibliotecaTermosBackup;
