@@ -158,7 +158,7 @@ def exibir_resumo_final(resultados: list[dict], caminho_pdf_consolidado: Optiona
     total = len(resultados)
 
     print("\n" + "=" * 70)
-    print("  RESUMO DA TRIAGEM — PREX/IFB")
+    print("  RESUMO — TRIAGEM PREX")
     print("=" * 70)
     print(f"  Total de propostas analisadas : {total}")
     print("=" * 70)
@@ -180,7 +180,7 @@ def main() -> None:
     logger.info("=" * 60)
 
     print("\n" + "=" * 70)
-    print("  🏛️  SISTEMA DE TRIAGEM DE EDITAIS — PREX/IFB")
+    print("  🏛️  TRIAGEM PREX")
     print(f"  Base legal: Resolução nº 42/2020")
     print(f"  Execução: {inicio.strftime('%d/%m/%Y às %H:%M')}")
     print("=" * 70)
