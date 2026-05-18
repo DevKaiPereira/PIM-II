@@ -1,0 +1,5 @@
+arquivo,status,p1_aprovado,p1_impedimentos,p2_aprovado,p2_alertas,p3_aprovado,p3_impedimentos,p4_aprovado,p4_alertas,p5_aprovado,p5_alertas,p6_aprovado,p6_impedimentos,bloco1_aprovado,bloco1_impedimentos,bloco2_aprovado,bloco2_alertas,bloco3_aprovado,bloco3_impedimentos,bloco4_aprovado,bloco4_alertas,pontuacao_merito,classificacao_merito,data_analise
+FORMULÁRIO DE SUBMISSÃO DE PROPOSTA DE EXTENSÃ1.pdf,Processado,False,afastado para pos-graduacao,True,,False,,False,Nenhum termo relevante encontrado para este pilar.,False,,False,,False,,False,,False,,False,,1,Baixo Mérito,18/05/2026 14:48:26
+FORMULÁRIO DE SUBMISSÃO DE PROPOSTA DE EXTENSÃ2.pdf,Processado,False,licenca premio | outra instituicao,True,,False,,True,,False,,False,,False,,False,,False,,False,,14,Médio Mérito,18/05/2026 14:48:26
+FORMULÁRIO DE SUBMISSÃO DE PROPOSTA DE EXTENSÃO.pdf,Processado,True,,True,,False,,True,,False,,False,,False,,False,,False,,False,,11,Baixo Mérito,18/05/2026 14:48:26
+tem que aprovar.pdf,Processado,True,,True,,False,,True,,False,,False,,False,,False,,False,,False,,42,Alto Mérito,18/05/2026 14:48:27
