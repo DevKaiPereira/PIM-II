@@ -7,7 +7,6 @@ Projeto desenvolvido para a Faculdade UNIP (Universidade Paulista).
 - Kaique Souza Pereira — RA: 2625068
 - Edgar Parreira França — RA: 2625239
 - Ana Luiza Morais Barbieri — RA: 2622005
-- Melissa Maria Galvão de Oliveira — RA: 2625411
 - Theo Amaral da Silva — RA: 2626098
 
 ## Sobre o projeto
