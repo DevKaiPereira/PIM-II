@@ -12,8 +12,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from config.settings import (
     PASTA_PDFS,
     PASTA_RELATORIOS,
-    PASTA_RELATORIOS_TXT,
-    PASTA_RELATORIOS_PDF,
     ARQUIVO_BIBLIOTECA,
     RELATORIO_CONSOLIDADO,
     # ARQUIVO_LOG, # Removed from here, defined globally below
@@ -86,9 +84,10 @@ def carregar_biblioteca(caminho: Path) -> dict:
 def listar_pdfs(pasta: Path) -> list[Path]:
 
     if not pasta.exists():
+        pasta.mkdir(parents=True, exist_ok=True)
         logging.warning(
             "Pasta de PDFs não encontrada: %s\n"
-            "Crie a pasta e adicione os PDFs das propostas.",
+            "A pasta foi criada automaticamente. Adicione os PDFs nela e execute o programa novamente.",
             pasta
         )
         return []
@@ -159,33 +158,14 @@ def exibir_resumo_final(resultados: list[dict], caminho_pdf_consolidado: Optiona
     total = len(resultados)
 
     print("\n" + "=" * 70)
-    print("  RESUMO DA TRIAGEM — PREX/IFB")
+    print("  RESUMO — TRIAGEM PREX")
     print("=" * 70)
     print(f"  Total de propostas analisadas : {total}")
     print("=" * 70)
 
     if caminho_pdf_consolidado:
         print(f"\n  📦 PDF Consolidado de Relatórios: {caminho_pdf_consolidado.resolve()}")
-    print(f"\n  📁 Arquivos salvos em: {PASTA_RELATORIOS.resolve()}/")
-    if pasta_relatorios:
-        relatorios_gerados = listar_relatorios_individuais(pasta_relatorios)
-        print("\n  📄 Pareceres Individuais Gerados:")
-        print("-" * 70)
-        if relatorios_gerados:
-            max_exibir = 5
-            for relatorio in relatorios_gerados[:max_exibir]:
-                print(f"     • {relatorio.name}")
-            
-            restantes = len(relatorios_gerados) - max_exibir
-            if restantes > 0:
-                print(f"     ... e mais {restantes} parecer(es) salvo(s) no disco")
-        else:
-            print("     (nenhum parecer encontrado)")
-
-    print("\n  📁 Arquivos salvos em: relatorios/")
-    print("     • relatorio_txt/ (TXT)")
-    print("     • relatorio_pdf/ (PDF)")
-    print(f"  📊 Relatório consolidado (CSV): {RELATORIO_CONSOLIDADO}")
+    print(f"   Relatório consolidado (CSV): {RELATORIO_CONSOLIDADO}")
     print(f"  📝 Log completo: {ARQUIVO_LOG}")
     print("=" * 70)
 
@@ -200,7 +180,7 @@ def main() -> None:
     logger.info("=" * 60)
 
     print("\n" + "=" * 70)
-    print("  🏛️  SISTEMA DE TRIAGEM DE EDITAIS — PREX/IFB")
+    print("  🏛️  TRIAGEM PREX")
     print(f"  Base legal: Resolução nº 42/2020")
     print(f"  Execução: {inicio.strftime('%d/%m/%Y às %H:%M')}")
     print("=" * 70)
@@ -220,8 +200,6 @@ def main() -> None:
     print("-" * 70)
 
     PASTA_RELATORIOS.mkdir(parents=True, exist_ok=True)
-    PASTA_RELATORIOS_TXT.mkdir(parents=True, exist_ok=True)
-    PASTA_RELATORIOS_PDF.mkdir(parents=True, exist_ok=True)
     inicializar_csv_consolidado(RELATORIO_CONSOLIDADO)
 
     resultados = []
@@ -232,8 +210,6 @@ def main() -> None:
         resultado = processar_proposta(
             caminho_pdf=caminho_pdf,
             biblioteca=biblioteca,
-            pasta_relatorios=PASTA_RELATORIOS_TXT,
-            pasta_relatorios_pdf=PASTA_RELATORIOS_PDF,
             caminho_csv_consolidado=RELATORIO_CONSOLIDADO,
         )
 
@@ -258,8 +234,6 @@ def main() -> None:
         caminho_pdf_consolidado = gerar_pdf_consolidado_a_partir_de_conteudo(todos_conteudos_relatorios, caminho_pdf_consolidado)
 
     exibir_resumo_final(resultados, caminho_pdf_consolidado)
-
-    exibir_resumo_final(resultados, PASTA_RELATORIOS_TXT)
     
     print(f"\n  ⏱️  Tempo total: {duracao:.1f} segundos\n")
 

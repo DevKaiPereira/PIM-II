@@ -1,4 +1,4 @@
-# PIM-II - Sistema de Triagem de Edital
+# PIM-II - Sistema Triagem PREX
 
 Projeto desenvolvido para a Faculdade UNIP (Universidade Paulista).
 
@@ -12,17 +12,17 @@ Projeto desenvolvido para a Faculdade UNIP (Universidade Paulista).
 
 ## Sobre o projeto
 
-Este projeto implementa um sistema automatizado de triagem de editais. A aplicação processa documentos em PDF e gera relatórios estruturados em TXT, extraindo e organizando as informações relevantes de forma padronizada.
+Este projeto implementa o sistema automatizado **Triagem PREX**. A aplicação processa documentos em PDF e gera relatórios estruturados, extraindo e organizando as informações relevantes de forma padronizada.
 
-O objetivo é apoiar a análise de documentos relacionados às submissões de editais da Pró-Reitoria de Extensão e Cultura, reduzindo o trabalho manual e tornando a leitura dos dados mais clara.
+O objetivo é atuar como uma ferramenta de apoio à análise técnica de documentos relacionados às submissões de editais da Pró-Reitoria de Extensão e Cultura (PREX/IFB), reduzindo o trabalho manual e auxiliando a comissão avaliadora na tomada de decisão.
 
 ## Como funciona
 
 O sistema segue este fluxo:
 
 1. **Entrada**: recebe um arquivo PDF com a documentação da submissão ao edital.
-2. **Processamento**: analisa o conteúdo do documento com base em uma estrutura JSON montada a partir de editais anteriores da PREX e de suas normativas.
-3. **Saída**: gera um relatório estruturado em formato TXT com os resultados da análise.
+2. **Processamento**: analisa o conteúdo do documento com base em uma biblioteca de termos (JSON) fundamentada nos editais da PREX e normativas vigentes.
+3. **Saída**: gera relatórios estruturados individuais em formato TXT, além de exportar os resultados da análise técnica consolidados em PDF e CSV.
 
 ## Como usar
 
@@ -55,10 +55,7 @@ make run-txt
 
 Após a execução, será criado o arquivo `resultado.txt` contendo o relatório com as informações extraídas do PDF processado.
 
-Além disso, os relatórios individuais gerados ficam em:
-
-- `prex_triagem/relatorios/relatorio_txt/` (TXT)
-- `prex_triagem/relatorios/relatorio_pdf/` (PDF)
+O relatório consolidado em PDF e o CSV sumarizado serão salvos juntos na pasta `relatorios/`.
 
 ## Estrutura do projeto
 

@@ -1,14 +1,19 @@
+import sys
 from pathlib import Path
 
+if getattr(sys, 'frozen', False):
+    # Rodando como executável compilado (PyInstaller)
+    ROOT_DIR = Path(sys._MEIPASS)
+    BASE_EXEC_DIR = Path(sys.executable).parent
+else:
+    # Rodando como script normal (.py)
+    ROOT_DIR = Path(__file__).resolve().parent.parent
+    BASE_EXEC_DIR = ROOT_DIR
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
-
-PASTA_PDFS = ROOT_DIR / "data" / "pdfs_entrada"
-PASTA_EDITAIS_JSON = ROOT_DIR / "data" / "editais_json"
-PASTA_RELATORIOS = ROOT_DIR / "relatorios"
-PASTA_RELATORIOS_TXT = PASTA_RELATORIOS / "relatorio_txt"
-PASTA_RELATORIOS_PDF = PASTA_RELATORIOS / "relatorio_pdf"
-PASTA_LOGS = ROOT_DIR / "logs"
+PASTA_PDFS = BASE_EXEC_DIR / "data" / "pdfs_entrada"
+PASTA_EDITAIS_JSON = BASE_EXEC_DIR / "data" / "editais_json"
+PASTA_RELATORIOS = BASE_EXEC_DIR / "relatorios"
+PASTA_LOGS = BASE_EXEC_DIR / "logs"
 ARQUIVO_BIBLIOTECA = ROOT_DIR / "biblioteca_termos.json"
 RELATORIO_CONSOLIDADO = PASTA_RELATORIOS / "consolidado.csv"
 ARQUIVO_LOG = PASTA_LOGS / "triagem.log"

@@ -33,17 +33,10 @@ logger = logging.getLogger(__name__)
 def gerar_relatorio_individual(
     nome_arquivo: str,
     resultados_blocos: dict[str, Any],
-    resultado_merito: dict[str, Any],
-    pasta_saida: Path,
+    resultado_merito: dict[str, Any]
 ) -> list[str]:
 
-    status = determinar_status(resultados_blocos, resultado_merito) # Mantido apenas para logs internos
-    pasta_saida_pdf: Path | None = None,
-) -> Path:
-
     agora = datetime.now().strftime("%d/%m/%Y às %H:%M:%S")
-    nome_relatorio = f"{Path(nome_arquivo).stem}_relatorio.txt"
-    caminho_saida = pasta_saida / nome_relatorio
 
     linhas = []
     
@@ -52,13 +45,13 @@ def gerar_relatorio_individual(
 
     linhas += [
         SEPARADOR,
-        "  PARECER CONSULTIVO DA MÁQUINA — PREX/IFB",
-        "  Base legal: Resolução nº 42/2020",
+        "  RELATÓRIO DE TRIAGEM PREX",
+        "  Base legal: Resolução nº 42/2020 — IFB",
         SEPARADOR,
-        f"  Proposta analisada  : {nome_arquivo}",
-        f"  Data/hora da análise: {agora}",
+        f"  Documento Analisado  : {nome_arquivo}",
+        f"  Data/Hora da Análise : {agora}",
         SEPARADOR,
-        f"  CLASSIFICAÇÃO DE MÉRITO: {classificacao_merito} 🌟",
+        f"  CLASSIFICAÇÃO DE MÉRITO: {classificacao_merito}",
         SEPARADOR,
         "",
     ]
@@ -68,20 +61,20 @@ def gerar_relatorio_individual(
     for chave_bloco, nome_bloco in NOMES_BLOCOS.items():
         resultado = resultados_blocos.get(chave_bloco, {})
         for imp in resultado.get("impedimentos", []):
-            avisos_topo.append(f"- A máquina detectou a palavra '{imp}' no {nome_bloco}. Requer leitura humana rápida para confirmar contexto.")
+            avisos_topo.append(f"- Detectado o termo '{imp}' no {nome_bloco}. Requer análise para confirmação de contexto.")
         for alerta in resultado.get("alertas", []):
             avisos_topo.append(f"- Alerta no {nome_bloco}: {alerta}")
 
     if avisos_topo:
-        linhas.append("  ATENÇÃO DA EQUIPE DE AVALIAÇÃO:")
+        linhas.append("  PONTOS DE ATENÇÃO PARA AVALIAÇÃO:")
         for aviso in avisos_topo:
             linhas.append(f"  {aviso}")
     else:
-        linhas.append("  ATENÇÃO DA EQUIPE: A máquina não detectou palavras impeditivas. Documentação base parece regular.")
+        linhas.append("  PONTOS DE ATENÇÃO: Não foram detectados termos impeditivos. A documentação base apresenta conformidade inicial.")
     
     linhas.append(SEPARADOR_FINO)
     linhas.append("")
-    linhas.append("  DETALHAMENTO DA VARREDURA TÉCNICA:")
+    linhas.append("  DETALHAMENTO DA ANÁLISE TÉCNICA:")
     linhas.append("")
 
     # --- RENDERIZAÇÃO DOS BLOCOS (Mantida igual ao original) ---
@@ -138,25 +131,13 @@ def gerar_relatorio_individual(
     linhas += [
         "",
         SEPARADOR,
-        "  ⚠️  AVISO: Este relatório é uma ferramenta de APOIO à triagem.",
-        "  A decisão final de admissibilidade é humana, de responsabilidade da PREX/IFB.",
+        "  NOTA: Este relatório é gerado automaticamente pelo sistema Triagem PREX.",
+        "  Trata-se de uma ferramenta de apoio. A decisão final é de responsabilidade da comissão avaliadora.",
         SEPARADOR,
     ]
 
     logger.debug("Conteúdo do relatório individual gerado para '%s'.", nome_arquivo)
     return linhas
-    pasta_saida.mkdir(parents=True, exist_ok=True)
-    caminho_saida.write_text("\n".join(linhas), encoding="utf-8")
-
-    pasta_pdf = pasta_saida_pdf or pasta_saida
-    pasta_pdf.mkdir(parents=True, exist_ok=True)
-    caminho_pdf = pasta_pdf / f"{Path(nome_arquivo).stem}_relatorio.pdf"
-    pdf_ok = _gerar_pdf_relatorio(linhas, caminho_pdf)
-
-    logger.info("Relatório individual gerado: %s", caminho_saida)
-    if pdf_ok:
-        logger.info("Relatório PDF gerado: %s", caminho_pdf)
-    return caminho_saida
 
 def inicializar_csv_consolidado(caminho_csv: Path) -> None:
 
@@ -200,6 +181,7 @@ def registrar_no_csv_consolidado(
     resultado_merito: dict[str, Any],
 ) -> None:
 
+    status = "Processado"
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
     def _imp(bloco_key: str) -> str:

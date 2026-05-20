@@ -16,8 +16,6 @@ logger = logging.getLogger(__name__)
 def processar_proposta(
     caminho_pdf: Path,
     biblioteca: dict[str, Any],
-    pasta_relatorios: Path,
-    pasta_relatorios_pdf: Path,
     caminho_csv_consolidado: Path,
 ) -> Optional[dict[str, Any]]:
  
@@ -50,9 +48,7 @@ def processar_proposta(
     report_content = gerar_relatorio_individual(
         nome_arquivo=nome_arquivo,
         resultados_blocos=resultados_blocos,
-        resultado_merito=resultado_merito,
-        pasta_saida=pasta_relatorios,
-        pasta_saida_pdf=pasta_relatorios_pdf,
+        resultado_merito=resultado_merito
     )
 
     registrar_no_csv_consolidado(
@@ -62,11 +58,8 @@ def processar_proposta(
         resultado_merito=resultado_merito,
     )
 
-
     print(
-        f"  {icone} {status:<8} | "
-        f"Mérito: {resultado_merito['pontuacao_total']:>3}pts ({resultado_merito['classificacao']}) | {nome_arquivo}"
-        f"Mérito: {resultado_merito['pontuacao_total']:>3}pts "
+        f"  ✅ Concluído | Mérito: {resultado_merito['pontuacao_total']:>3}pts "
         f"({resultado_merito['classificacao']}) | "
         f"{nome_arquivo}"
     )
